@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="CustomerManagement.Api/CustomerManagement.Api.csproj" Id="6c672f08-6ba9-4246-a71c-88a882dd8572" />
   <Project Path="CustomerManagement.Domain/CustomerManagement.Domain.csproj" />
   <Project Path="CustomerManagement.Infrastructure/CustomerManagement.Infrastructure.csproj" Id="c0260b6e-3af4-4b68-a7a9-1ec4f123a2a0" />
 </Solution>
