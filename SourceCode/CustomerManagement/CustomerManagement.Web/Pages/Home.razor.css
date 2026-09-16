@@ -1,0 +1,14 @@
+.dashboard-card {
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    background: white;
+    transition: box-shadow 0.2s ease;
+}
+
+    .dashboard-card:hover {
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    }
+
+.dashboard-icon {
+    margin-bottom: 16px;
+}

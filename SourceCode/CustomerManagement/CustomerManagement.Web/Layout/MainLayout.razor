@@ -1,0 +1,121 @@
+﻿@inherits LayoutComponentBase
+@inject CustomerManagement.Web.Services.Interfaces.IAuthService AuthService
+@inject NavigationManager Navigation
+
+<MudThemeProvider Theme="@_theme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+
+    <MudAppBar Elevation="1"
+               Fixed="true"
+               Class="cep-appbar">
+
+        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                       Color="Color.Inherit"
+                       Edge="Edge.Start"
+                       OnClick="@ToggleDrawer" />
+
+        <div class="cep-brand">
+            <img src="favicon-cep-150x150.png"
+                 alt="CEP"
+                 class="cep-logo" />
+
+            <div class="cep-brand-text">
+                <MudText Typo="Typo.subtitle1">
+                    Customer Management
+                </MudText>
+                <span>Vì lợi ích cộng đồng</span>
+            </div>
+        </div>
+
+        <MudSpacer />
+
+        <MudSpacer />
+
+        <div class="user-actions">
+            <MudIcon Icon="@Icons.Material.Filled.AccountCircle"
+                     Size="Size.Medium" />
+
+            <MudText Typo="Typo.body2"
+                     Class="user-name">
+                Admin
+            </MudText>
+
+            <MudTooltip Text="Đăng xuất">
+                <MudIconButton Icon="@Icons.Material.Filled.Logout"
+                               Color="Color.Inherit"
+                               OnClick="@Logout" />
+            </MudTooltip>
+        </div>
+
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="_drawerOpen"
+               Variant="DrawerVariant.Responsive"
+               Elevation="1"
+               Class="cep-drawer">
+
+        <NavMenu />
+
+    </MudDrawer>
+
+    <MudMainContent Class="cep-main-content">
+
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge"
+                      Class="pa-6">
+
+            @Body
+
+        </MudContainer>
+
+    </MudMainContent>
+
+</MudLayout>
+
+@code {
+    private bool _drawerOpen = true;
+
+    private readonly MudTheme _theme = new()
+    {
+        PaletteLight = new PaletteLight
+        {
+            Primary = "#0645B5",
+            Secondary = "#06347F",
+
+            AppbarBackground = "#0645B5",
+            AppbarText = "#FFFFFF",
+
+            DrawerBackground = "#FFFFFF",
+            DrawerText = "#1F2937",
+
+            Background = "#F5F7FA",
+            Surface = "#FFFFFF",
+
+            TextPrimary = "#1F2937",
+            TextSecondary = "#6B7280",
+
+            Success = "#2E7D32",
+            Error = "#D32F2F"
+        },
+
+        LayoutProperties = new LayoutProperties
+        {
+            DefaultBorderRadius = "8px"
+        }
+    };
+
+    private void ToggleDrawer()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+
+        Navigation.NavigateTo("/login");
+    }
+}

@@ -1,0 +1,79 @@
+﻿@page "/"
+@attribute [Authorize]
+
+<PageTitle>Tổng quan | CEP</PageTitle>
+
+<div class="mb-6">
+
+    <MudText Typo="Typo.h4">
+        Tổng quan
+    </MudText>
+
+    <MudText Typo="Typo.body1"
+             Color="Color.Secondary">
+        Hệ thống quản lý khách hàng CEP
+    </MudText>
+
+</div>
+
+<MudGrid>
+
+    <MudItem xs="12" sm="6" md="4">
+
+        <MudPaper Elevation="0"
+                  Class="pa-5 dashboard-card">
+
+            <div class="dashboard-icon">
+                <MudIcon Icon="@Icons.Material.Filled.People"
+                         Color="Color.Primary"
+                         Size="Size.Large" />
+            </div>
+
+            <MudText Typo="Typo.caption">
+                KHÁCH HÀNG
+            </MudText>
+
+            <MudText Typo="Typo.h4"
+                     Color="Color.Primary">
+                --
+            </MudText>
+
+            <MudText Typo="Typo.body2"
+                     Color="Color.Secondary">
+                Tổng số khách hàng
+            </MudText>
+
+        </MudPaper>
+
+    </MudItem>
+
+    <MudItem xs="12" sm="6" md="4">
+
+        <MudPaper Elevation="0"
+                  Class="pa-5 dashboard-card">
+
+            <div class="dashboard-icon">
+                <MudIcon Icon="@Icons.Material.Filled.CheckCircle"
+                         Color="Color.Success"
+                         Size="Size.Large" />
+            </div>
+
+            <MudText Typo="Typo.caption">
+                ĐANG HOẠT ĐỘNG
+            </MudText>
+
+            <MudText Typo="Typo.h4"
+                     Color="Color.Success">
+                --
+            </MudText>
+
+            <MudText Typo="Typo.body2"
+                     Color="Color.Secondary">
+                Khách hàng đang hoạt động
+            </MudText>
+
+        </MudPaper>
+
+    </MudItem>
+
+</MudGrid>

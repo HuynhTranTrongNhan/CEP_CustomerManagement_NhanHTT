@@ -1,0 +1,31 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="@_theme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<div class="auth-layout">
+    @Body
+</div>
+
+@code {
+    private readonly MudTheme _theme = new()
+    {
+        PaletteLight = new PaletteLight
+        {
+            Primary = "#0645B5",
+            Secondary = "#06347F",
+            Background = "#F5F7FA",
+            Surface = "#FFFFFF",
+            TextPrimary = "#1F2937",
+            TextSecondary = "#6B7280",
+            Error = "#D32F2F"
+        },
+
+        LayoutProperties = new LayoutProperties
+        {
+            DefaultBorderRadius = "8px"
+        }
+    };
+}

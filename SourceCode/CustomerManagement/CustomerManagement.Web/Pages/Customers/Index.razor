@@ -1,0 +1,87 @@
+﻿@page "/customers"
+@attribute [Authorize]
+
+@using CustomerManagement.Web.Services.Interfaces
+@inject ICustomerService CustomerService
+
+<PageTitle>Quản lý khách hàng | CEP</PageTitle>
+
+<MudText Typo="Typo.h4">
+    Quản lý khách hàng
+</MudText>
+
+<MudText Typo="Typo.body1"
+         Color="Color.Secondary"
+         Class="mb-6">
+    Danh sách khách hàng CEP
+</MudText>
+
+@if (_loading)
+{
+    <MudProgressCircular Indeterminate="true"
+                         Color="Color.Primary" />
+}
+else if (!string.IsNullOrWhiteSpace(_errorMessage))
+{
+    <MudAlert Severity="Severity.Error">
+        @_errorMessage
+    </MudAlert>
+}
+else
+{
+    <MudAlert Severity="Severity.Success"
+              Variant="Variant.Outlined">
+
+        Kết nối API thành công.
+        Tìm thấy @_totalCount khách hàng.
+
+    </MudAlert>
+
+    <MudPaper Class="pa-4 mt-4"
+              Elevation="0">
+
+        @foreach (var customer in _customers)
+        {
+            <MudText>
+                @customer.CustomerCode -
+                @customer.FullName -
+                @customer.PhoneNumber
+            </MudText>
+        }
+
+    </MudPaper>
+}
+
+@code {
+    private bool _loading = true;
+
+    private string? _errorMessage;
+
+    private List<CustomerManagement.Web.Models.Customer.CustomerModel>
+        _customers = [];
+
+    private int _totalCount;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var result =
+                await CustomerService.GetCustomersAsync(
+                    pageNumber: 1,
+                    pageSize: 10);
+
+            _customers = result.Items;
+            _totalCount = result.TotalCount;
+        }
+        catch (Exception)
+        {
+            _errorMessage =
+                "Không thể kết nối đến Customer API.";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}

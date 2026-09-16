@@ -1,0 +1,32 @@
+.cep-navigation {
+    padding: 24px 12px;
+}
+
+.cep-menu-title {
+    display: block;
+    padding: 0 16px 10px 16px;
+    color: #9CA3AF;
+    font-weight: 600;
+}
+
+.cep-sidebar-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 16px;
+}
+
+.cep-footer-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 16px;
+    color: #6B7280;
+    font-size: 12px;
+}
+
+.cep-footer-logo {
+    width: 44px;
+    height: 30px;
+    object-fit: contain;
+}

@@ -1,0 +1,48 @@
+.cep-appbar {
+    background: #0645B5;
+    color: white;
+}
+
+.cep-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: 8px;
+}
+
+.cep-logo {
+    width: 54px;
+    height: 36px;
+    object-fit: contain;
+}
+
+.cep-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+    .cep-brand-text span {
+        font-size: 11px;
+        opacity: 0.85;
+    }
+
+.cep-drawer {
+    border-right: 1px solid #E5E7EB;
+}
+
+.cep-main-content {
+    background: #F5F7FA;
+    min-height: 100vh;
+}
+
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-name {
+    font-weight: 500;
+    color: white;
+}

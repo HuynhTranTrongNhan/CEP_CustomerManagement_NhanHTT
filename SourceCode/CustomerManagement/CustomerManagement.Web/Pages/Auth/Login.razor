@@ -1,0 +1,146 @@
+﻿@page "/login"
+@layout CustomerManagement.Web.Layout.LoginLayout
+
+@using CustomerManagement.Web.Models.Auth
+@using CustomerManagement.Web.Services.Interfaces
+
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+
+<PageTitle>Đăng nhập | CEP</PageTitle>
+
+<div class="login-wrapper">
+
+    <MudPaper Class="login-card" Elevation="2">
+
+        <div class="login-brand">
+            <img src="favicon-cep-150x150.png"
+                 alt="CEP"
+                 class="login-logo" />
+
+            <MudText Typo="Typo.h5" Class="login-title">
+                Đăng nhập hệ thống
+            </MudText>
+
+            <MudText Typo="Typo.body2"
+                     Color="Color.Secondary">
+                Hệ thống quản lý khách hàng CEP
+            </MudText>
+        </div>
+
+        <EditForm Model="@_model"
+                  OnValidSubmit="@HandleLogin">
+
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <MudTextField @bind-Value="_model.Username"
+                              Label="Tên đăng nhập"
+                              Placeholder="Nhập tên đăng nhập"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.PersonOutline"
+                              For="@(() => _model.Username)"
+                              FullWidth="true" />
+            </div>
+
+            <div class="form-group">
+                <MudTextField @bind-Value="_model.Password"
+                              Label="Mật khẩu"
+                              Placeholder="Nhập mật khẩu"
+                              Variant="Variant.Outlined"
+                              InputType="@(_showPassword
+                                                  ? InputType.Text
+                                                  : InputType.Password)"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@(_showPassword
+                                                  ? Icons.Material.Filled.VisibilityOff
+                                              : Icons.Material.Filled.Visibility)"
+                              OnAdornmentClick="@TogglePassword"
+                              For="@(() => _model.Password)"
+                              FullWidth="true" />
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(_errorMessage))
+            {
+                <MudAlert Severity="Severity.Error"
+                          Variant="Variant.Text"
+                          Dense="true"
+                          Class="login-error">
+                    @_errorMessage
+                </MudAlert>
+            }
+
+            <MudButton ButtonType="ButtonType.Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       FullWidth="true"
+                       Disabled="@_loading"
+                       Class="login-button"
+                       Size="Size.Large">
+
+                @if (_loading)
+                {
+                    <MudProgressCircular Indeterminate="true"
+                                         Size="Size.Small"
+                                         Class="me-2" />
+                }
+
+                Đăng nhập
+            </MudButton>
+
+        </EditForm>
+
+        <div class="login-footer">
+            <MudText Typo="Typo.caption"
+                     Color="Color.Secondary">
+                CEP — Vì lợi ích cộng đồng
+            </MudText>
+        </div>
+
+    </MudPaper>
+
+</div>
+
+@code {
+    private readonly LoginRequest _model = new();
+
+    private bool _loading;
+    private bool _showPassword;
+    private string? _errorMessage;
+
+    private async Task HandleLogin()
+    {
+        _loading = true;
+        _errorMessage = null;
+
+        try
+        {
+            var success = await AuthService.LoginAsync(_model);
+
+            if (!success)
+            {
+                _errorMessage =
+                    "Tên đăng nhập hoặc mật khẩu không chính xác.";
+
+                return;
+            }
+
+            Navigation.NavigateTo("/");
+        }
+        catch
+        {
+            _errorMessage =
+                "Không thể kết nối đến hệ thống. Vui lòng thử lại.";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void TogglePassword()
+    {
+        _showPassword = !_showPassword;
+    }
+}
