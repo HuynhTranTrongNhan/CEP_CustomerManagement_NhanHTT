@@ -6,6 +6,8 @@ using CustomerManagement.Api.Services.Interfaces;
 using CustomerManagement.Infrastructure.Repositories.Implementations;
 using CustomerManagement.Infrastructure.Repositories.Interfaces;
 
+using CustomerManagement.Api.Middleware;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -29,6 +31,8 @@ using (var scope = app.Services.CreateScope())
 
     await DbSeeder.SeedAsync(dbContext);
 }
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

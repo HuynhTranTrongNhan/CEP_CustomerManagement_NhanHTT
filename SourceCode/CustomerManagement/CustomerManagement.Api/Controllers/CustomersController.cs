@@ -55,53 +55,35 @@ public class CustomersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ApiResponse<CustomerResponseDto>>> Create([FromBody] CreateCustomerRequest request)
     {
-        try
-        {
-            var customer = await _customerService.CreateAsync(request);
+        var customer = await _customerService.CreateAsync(request);
 
-            return CreatedAtAction(
-                nameof(GetById),
-                new { id = customer.Id },
-                ApiResponse<CustomerResponseDto>.Ok(
-                    customer,
-                    "Customer created successfully."));
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(
-                ApiResponse<CustomerResponseDto>.Fail(
-                    ex.Message));
-        }
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = customer.Id },
+            ApiResponse<CustomerResponseDto>.Ok(
+                customer,
+                "Customer created successfully."));
     }
 
     // PUT: api/customers/1
     [HttpPut("{id:int}")]
     public async Task<ActionResult<ApiResponse<CustomerResponseDto>>> Update(int id, [FromBody] UpdateCustomerRequest request)
     {
-        try
-        {
-            var customer = await _customerService.UpdateAsync(
-                id,
-                request);
+        var customer = await _customerService.UpdateAsync(
+            id,
+            request);
 
-            if (customer is null)
-            {
-                return NotFound(
-                    ApiResponse<CustomerResponseDto>.Fail(
-                        "Customer not found."));
-            }
-
-            return Ok(
-                ApiResponse<CustomerResponseDto>.Ok(
-                    customer,
-                    "Customer updated successfully."));
-        }
-        catch (InvalidOperationException ex)
+        if (customer is null)
         {
-            return Conflict(
+            return NotFound(
                 ApiResponse<CustomerResponseDto>.Fail(
-                    ex.Message));
+                    "Customer not found."));
         }
+
+        return Ok(
+            ApiResponse<CustomerResponseDto>.Ok(
+                customer,
+                "Customer updated successfully."));
     }
 
     // DELETE: api/customers/1
