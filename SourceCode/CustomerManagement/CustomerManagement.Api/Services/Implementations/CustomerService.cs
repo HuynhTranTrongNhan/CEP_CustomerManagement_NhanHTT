@@ -62,28 +62,31 @@ public class CustomerService : ICustomerService
             : MapToDto(customer);
     }
 
-    public async Task<CustomerResponseDto> CreateAsync(CreateCustomerRequest request)
+    public async Task<CustomerResponseDto> CreateAsync(
+    CreateCustomerRequest request)
     {
         var customer = new Customer
         {
+            CustomerCode = $"TMP-{Guid.NewGuid():N}",
+
             FullName = request.FullName.Trim(),
+
             Email = string.IsNullOrWhiteSpace(request.Email)
                 ? null
                 : request.Email.Trim(),
+
             PhoneNumber = request.PhoneNumber.Trim(),
+
             DateOfBirth = request.DateOfBirth,
             IsActive = request.IsActive,
             CreatedAt = DateTime.UtcNow
         };
 
-        // Save lần 1 để SQL Server sinh Id.
         await _customerRepository.AddAsync(customer);
         await _customerRepository.SaveChangesAsync();
 
-        // Sinh CustomerCode từ Id.
         customer.CustomerCode = $"KH{customer.Id:D6}";
 
-        // Save lần 2.
         _customerRepository.Update(customer);
         await _customerRepository.SaveChangesAsync();
 

@@ -39,39 +39,47 @@ public static class DbSeeder
             {
                 new()
                 {
-                    //CustomerCode = "KH000001",
-                    FullName = "Nguyễn Văn An",
-                    Email = "nguyenvanan@example.com",
+                    CustomerCode = $"TMP-{Guid.NewGuid():N}",
+                    FullName = "Nguyen Van An",
+                    Email = "an@example.com",
                     PhoneNumber = "0901234567",
-                    DateOfBirth = new DateTime(1995, 1, 15),
+                    DateOfBirth = new DateTime(1995, 5, 10),
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow
                 },
 
                 new()
                 {
-                    //CustomerCode = "KH000002",
-                    FullName = "Trần Thị Bình",
-                    Email = "tranthibinh@example.com",
+                    CustomerCode = $"TMP-{Guid.NewGuid():N}",
+                    FullName = "Tran Thi Binh",
+                    Email = "binh@example.com",
                     PhoneNumber = "0912345678",
-                    DateOfBirth = new DateTime(1998, 5, 20),
+                    DateOfBirth = new DateTime(1997, 8, 15),
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow
                 },
 
                 new()
                 {
-                    //CustomerCode = "KH000003",
-                    FullName = "Lê Minh Cường",
-                    Email = "leminhcuong@example.com",
+                    CustomerCode = $"TMP-{Guid.NewGuid():N}",
+                    FullName = "Le Van Cuong",
+                    Email = "cuong@example.com",
                     PhoneNumber = "0987654321",
-                    DateOfBirth = new DateTime(1992, 10, 8),
-                    IsActive = false,
+                    DateOfBirth = new DateTime(1992, 3, 20),
+                    IsActive = true,
                     CreatedAt = DateTime.UtcNow
                 }
             };
 
             await context.Customers.AddRangeAsync(customers);
+            await context.SaveChangesAsync();
+
+            foreach (var customer in customers)
+            {
+                customer.CustomerCode = $"KH{customer.Id:D6}";
+            }
+
+            await context.SaveChangesAsync();
         }
 
         await context.SaveChangesAsync();

@@ -2,6 +2,7 @@
 using CustomerManagement.Api.DTOs.Customer;
 using CustomerManagement.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CustomerManagement.Api.Controllers;
 
@@ -19,6 +20,7 @@ public class CustomersController : ControllerBase
     // GET: api/customers
     // GET: api/customers?search=nguyen&pageNumber=1&pageSize=10
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ApiResponse<PagedResult<CustomerResponseDto>>>> GetAll([FromQuery] string? search, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
         var result = await _customerService.GetAllAsync(
@@ -34,6 +36,7 @@ public class CustomersController : ControllerBase
 
     // GET: api/customers/1
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ApiResponse<CustomerResponseDto>>> GetById(int id)
     {
         var customer = await _customerService.GetByIdAsync(id);
@@ -53,6 +56,7 @@ public class CustomersController : ControllerBase
 
     // POST: api/customers
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ApiResponse<CustomerResponseDto>>> Create([FromBody] CreateCustomerRequest request)
     {
         var customer = await _customerService.CreateAsync(request);
@@ -67,6 +71,7 @@ public class CustomersController : ControllerBase
 
     // PUT: api/customers/1
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ApiResponse<CustomerResponseDto>>> Update(int id, [FromBody] UpdateCustomerRequest request)
     {
         var customer = await _customerService.UpdateAsync(
@@ -88,6 +93,7 @@ public class CustomersController : ControllerBase
 
     // DELETE: api/customers/1
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ApiResponse<object>>> Delete(int id)
     {
         var deleted = await _customerService.DeleteAsync(id);
