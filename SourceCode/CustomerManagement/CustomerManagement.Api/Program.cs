@@ -1,16 +1,40 @@
-using CustomerManagement.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-
+using CustomerManagement.Api.Middleware;
 using CustomerManagement.Api.Services.Implementations;
 using CustomerManagement.Api.Services.Interfaces;
+using CustomerManagement.Infrastructure.Data;
 using CustomerManagement.Infrastructure.Repositories.Implementations;
 using CustomerManagement.Infrastructure.Repositories.Interfaces;
-
-using CustomerManagement.Api.Middleware;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var errors = context.ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .SelectMany(x => x.Value!.Errors
+                    .Select(error => new
+                    {
+                        Field = x.Key,
+                        Message = string.IsNullOrWhiteSpace(error.ErrorMessage)
+                            ? "Invalid value."
+                            : error.ErrorMessage
+                    }))
+                .ToList();
+
+            return new BadRequestObjectResult(
+                new
+                {
+                    success = false,
+                    message = "Validation failed.",
+                    errors
+                });
+        };
+    });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

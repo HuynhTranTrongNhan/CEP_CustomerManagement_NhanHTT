@@ -64,21 +64,8 @@ public class CustomerService : ICustomerService
 
     public async Task<CustomerResponseDto> CreateAsync(CreateCustomerRequest request)
     {
-        var customerCode = request.CustomerCode.Trim();
-
-        var exists =
-            await _customerRepository.ExistsByCustomerCodeAsync(
-                customerCode);
-
-        if (exists)
-        {
-            throw new InvalidOperationException(
-                "Customer code already exists.");
-        }
-
         var customer = new Customer
         {
-            CustomerCode = customerCode,
             FullName = request.FullName.Trim(),
             Email = string.IsNullOrWhiteSpace(request.Email)
                 ? null
@@ -89,7 +76,15 @@ public class CustomerService : ICustomerService
             CreatedAt = DateTime.UtcNow
         };
 
+        // Save lần 1 để SQL Server sinh Id.
         await _customerRepository.AddAsync(customer);
+        await _customerRepository.SaveChangesAsync();
+
+        // Sinh CustomerCode từ Id.
+        customer.CustomerCode = $"KH{customer.Id:D6}";
+
+        // Save lần 2.
+        _customerRepository.Update(customer);
         await _customerRepository.SaveChangesAsync();
 
         return MapToDto(customer);
@@ -104,27 +99,18 @@ public class CustomerService : ICustomerService
             return null;
         }
 
-        var customerCode = request.CustomerCode.Trim();
-
-        var exists =
-            await _customerRepository.ExistsByCustomerCodeAsync(
-                customerCode,
-                id);
-
-        if (exists)
-        {
-            throw new InvalidOperationException(
-                "Customer code already exists.");
-        }
-
-        customer.CustomerCode = customerCode;
         customer.FullName = request.FullName.Trim();
+
         customer.Email = string.IsNullOrWhiteSpace(request.Email)
             ? null
             : request.Email.Trim();
+
         customer.PhoneNumber = request.PhoneNumber.Trim();
+
         customer.DateOfBirth = request.DateOfBirth;
+
         customer.IsActive = request.IsActive;
+
         customer.UpdatedAt = DateTime.UtcNow;
 
         _customerRepository.Update(customer);

@@ -1,12 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using CustomerManagement.Api.Validation;
 
 namespace CustomerManagement.Api.DTOs.Customer;
 
 public class UpdateCustomerRequest
 {
-    [Required]
-    [MaxLength(50)]
-    public string CustomerCode { get; set; } = string.Empty;
+    //[Required]
+    //[MaxLength(50)]
+    //public string CustomerCode { get; set; } = string.Empty;
 
     [Required]
     [MaxLength(200)]
@@ -18,8 +19,12 @@ public class UpdateCustomerRequest
 
     [Required]
     [MaxLength(20)]
+    [RegularExpression(
+        @"^[0-9]+$",
+        ErrorMessage = "Phone number must contain digits only.")]
     public string PhoneNumber { get; set; } = string.Empty;
 
+    [NotFutureDate]
     public DateTime? DateOfBirth { get; set; }
 
     public bool IsActive { get; set; }

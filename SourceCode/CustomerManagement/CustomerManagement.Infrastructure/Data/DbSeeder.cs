@@ -39,7 +39,7 @@ public static class DbSeeder
             {
                 new()
                 {
-                    CustomerCode = "KH000001",
+                    //CustomerCode = "KH000001",
                     FullName = "Nguyễn Văn An",
                     Email = "nguyenvanan@example.com",
                     PhoneNumber = "0901234567",
@@ -50,7 +50,7 @@ public static class DbSeeder
 
                 new()
                 {
-                    CustomerCode = "KH000002",
+                    //CustomerCode = "KH000002",
                     FullName = "Trần Thị Bình",
                     Email = "tranthibinh@example.com",
                     PhoneNumber = "0912345678",
@@ -61,7 +61,7 @@ public static class DbSeeder
 
                 new()
                 {
-                    CustomerCode = "KH000003",
+                    //CustomerCode = "KH000003",
                     FullName = "Lê Minh Cường",
                     Email = "leminhcuong@example.com",
                     PhoneNumber = "0987654321",
