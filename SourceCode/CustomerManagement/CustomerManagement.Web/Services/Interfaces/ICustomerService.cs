@@ -17,4 +17,6 @@ public interface ICustomerService
     Task<CustomerModel?> UpdateAsync(int id, UpdateCustomerRequest request);
 
     Task<bool> DeleteAsync(int id);
+
+    Task<CustomerSummaryModel?> GetSummaryAsync();
 }

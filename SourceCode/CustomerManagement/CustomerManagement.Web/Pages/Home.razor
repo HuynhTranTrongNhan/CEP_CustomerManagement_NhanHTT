@@ -1,6 +1,11 @@
 ﻿@page "/"
 @attribute [Authorize]
 
+@using CustomerManagement.Web.Models.Customer
+@using CustomerManagement.Web.Services.Interfaces
+
+@inject ICustomerService CustomerService
+
 <PageTitle>Tổng quan | CEP</PageTitle>
 
 <div class="mb-6">
@@ -35,7 +40,7 @@
 
             <MudText Typo="Typo.h4"
                      Color="Color.Primary">
-                --
+                @(_summary?.TotalCustomers ?? 0)
             </MudText>
 
             <MudText Typo="Typo.body2"
@@ -64,7 +69,7 @@
 
             <MudText Typo="Typo.h4"
                      Color="Color.Success">
-                --
+                @(_summary?.ActiveCustomers ?? 0)
             </MudText>
 
             <MudText Typo="Typo.body2"
@@ -77,3 +82,20 @@
     </MudItem>
 
 </MudGrid>
+
+@code {
+    private CustomerSummaryModel? _summary;
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _summary = await CustomerService.GetSummaryAsync();
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}

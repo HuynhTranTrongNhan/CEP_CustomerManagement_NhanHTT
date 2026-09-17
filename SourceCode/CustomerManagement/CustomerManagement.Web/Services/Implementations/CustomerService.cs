@@ -90,4 +90,13 @@ public class CustomerService : ICustomerService
 
         return response.IsSuccessStatusCode;
     }
+
+    public async Task<CustomerSummaryModel?> GetSummaryAsync()
+    {
+        var response =
+            await _httpClient.GetFromJsonAsync<ApiResponse<CustomerSummaryModel>>(
+                "api/Customers/summary");
+
+        return response?.Data;
+    }
 }

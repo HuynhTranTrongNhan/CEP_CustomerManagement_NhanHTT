@@ -20,4 +20,6 @@ public interface ICustomerService
         UpdateCustomerRequest request);
 
     Task<bool> DeleteAsync(int id);
+
+    Task<CustomerSummaryDto> GetSummaryAsync();
 }

@@ -154,4 +154,17 @@ public class CustomerService : ICustomerService
             UpdatedAt = customer.UpdatedAt
         };
     }
+
+    public async Task<CustomerSummaryDto> GetSummaryAsync()
+    {
+        var total = await _customerRepository.CountAsync();
+        var active = await _customerRepository.CountActiveAsync();
+
+        return new CustomerSummaryDto
+        {
+            TotalCustomers = total,
+            ActiveCustomers = active,
+            InactiveCustomers = total - active
+        };
+    }
 }

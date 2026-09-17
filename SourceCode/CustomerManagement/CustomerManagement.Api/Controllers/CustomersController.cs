@@ -110,4 +110,18 @@ public class CustomersController : ControllerBase
                 null!,
                 "Customer deleted successfully."));
     }
+
+    [HttpGet("summary")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetSummary()
+    {
+        var result = await _customerService.GetSummaryAsync();
+
+        return Ok(new ApiResponse<CustomerSummaryDto>
+        {
+            Success = true,
+            Message = "Get customer summary successfully.",
+            Data = result
+        });
+    }
 }

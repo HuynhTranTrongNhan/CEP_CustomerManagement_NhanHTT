@@ -109,4 +109,15 @@ public class CustomerRepository : ICustomerRepository
     {
         await _context.SaveChangesAsync();
     }
+
+    public async Task<int> CountAsync()
+    {
+        return await _context.Customers.CountAsync();
+    }
+
+    public async Task<int> CountActiveAsync()
+    {
+        return await _context.Customers
+            .CountAsync(x => x.IsActive);
+    }
 }

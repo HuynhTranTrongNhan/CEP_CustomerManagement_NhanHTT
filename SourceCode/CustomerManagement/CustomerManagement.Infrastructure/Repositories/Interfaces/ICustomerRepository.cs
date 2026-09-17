@@ -26,4 +26,7 @@ public interface ICustomerRepository
     void Delete(Customer customer);
 
     Task SaveChangesAsync();
+
+    Task<int> CountAsync();
+    Task<int> CountActiveAsync();
 }
