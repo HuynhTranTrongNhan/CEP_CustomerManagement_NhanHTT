@@ -1,0 +1,67 @@
+﻿<MudDialog>
+
+    <DialogContent>
+
+        <div class="d-flex align-center mb-4">
+
+            <MudIcon Icon="@Icons.Material.Filled.WarningAmber"
+                     Color="Color.Error"
+                     Size="Size.Large"
+                     Class="me-3" />
+
+            <MudText Typo="Typo.h6">
+                Xóa khách hàng?
+            </MudText>
+
+        </div>
+
+        <MudText>
+            Bạn có chắc muốn xóa khách hàng
+            <strong>@CustomerName</strong>
+            (@CustomerCode)?
+        </MudText>
+
+        <MudText Typo="Typo.body2"
+                 Color="Color.Secondary"
+                 Class="mt-2">
+            Thao tác này không thể hoàn tác.
+        </MudText>
+
+    </DialogContent>
+
+    <DialogActions>
+
+        <MudButton OnClick="@Cancel">
+            Hủy
+        </MudButton>
+
+        <MudButton Color="Color.Error"
+                   Variant="Variant.Filled"
+                   OnClick="@Confirm">
+            Xóa
+        </MudButton>
+
+    </DialogActions>
+
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public string CustomerName { get; set; } = string.Empty;
+
+    [Parameter]
+    public string CustomerCode { get; set; } = string.Empty;
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void Confirm()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+}

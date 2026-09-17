@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject CustomerManagement.Web.Services.Interfaces.IAuthService AuthService
 @inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components.Authorization
 
 <MudThemeProvider Theme="@_theme" />
 <MudPopoverProvider />
@@ -39,10 +40,14 @@
             <MudIcon Icon="@Icons.Material.Filled.AccountCircle"
                      Size="Size.Medium" />
 
-            <MudText Typo="Typo.body2"
-                     Class="user-name">
-                Admin
-            </MudText>
+            <AuthorizeView>
+                <Authorized Context="auth">
+                    <MudText Typo="Typo.body2"
+                             Class="user-name">
+                        @auth.User.Identity?.Name
+                    </MudText>
+                </Authorized>
+            </AuthorizeView>
 
             <MudTooltip Text="Đăng xuất">
                 <MudIconButton Icon="@Icons.Material.Filled.Logout"

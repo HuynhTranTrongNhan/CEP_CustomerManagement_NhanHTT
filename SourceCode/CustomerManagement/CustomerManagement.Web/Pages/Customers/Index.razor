@@ -1,87 +1,319 @@
 ﻿@page "/customers"
 @attribute [Authorize]
 
+@using CustomerManagement.Web.Models.Customer
 @using CustomerManagement.Web.Services.Interfaces
+@using Microsoft.AspNetCore.Components.Web
+@using CustomerManagement.Web.Components.Customers
+
 @inject ICustomerService CustomerService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
 <PageTitle>Quản lý khách hàng | CEP</PageTitle>
 
-<MudText Typo="Typo.h4">
-    Quản lý khách hàng
-</MudText>
+<div class="d-flex justify-space-between align-center mb-5">
 
-<MudText Typo="Typo.body1"
-         Color="Color.Secondary"
-         Class="mb-6">
-    Danh sách khách hàng CEP
-</MudText>
+    <div>
+        <MudText Typo="Typo.h4">
+            Quản lý khách hàng
+        </MudText>
 
-@if (_loading)
-{
-    <MudProgressCircular Indeterminate="true"
-                         Color="Color.Primary" />
-}
-else if (!string.IsNullOrWhiteSpace(_errorMessage))
-{
-    <MudAlert Severity="Severity.Error">
-        @_errorMessage
-    </MudAlert>
-}
-else
-{
-    <MudAlert Severity="Severity.Success"
-              Variant="Variant.Outlined">
+        <MudText Typo="Typo.body1"
+                 Color="Color.Secondary">
+            Danh sách và quản lý thông tin khách hàng CEP
+        </MudText>
+    </div>
 
-        Kết nối API thành công.
-        Tìm thấy @_totalCount khách hàng.
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.Add"
+               OnClick="@AddCustomer">
+        Thêm khách hàng
+    </MudButton>
 
-    </MudAlert>
+</div>
 
-    <MudPaper Class="pa-4 mt-4"
-              Elevation="0">
+<MudPaper Elevation="0" Class="pa-5 customer-panel">
 
-        @foreach (var customer in _customers)
+    <div class="d-flex justify-space-between align-center mb-4">
+
+        <MudTextField @bind-Value="_search"
+                      Placeholder="Tìm theo họ tên hoặc số điện thoại..."
+                      Variant="Variant.Outlined"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      Immediate="true"
+                      Clearable="true"
+                      Class="customer-search"
+                      OnKeyDown="@HandleSearchKeyDown" />
+
+        <MudText Typo="Typo.body2"
+                 Color="Color.Secondary"
+                 Style="margin-left: 10px;">
+            Tổng: @_totalCount khách hàng
+        </MudText>
+
+    </div>
+
+    @if (_loading)
+    {
+        <div class="d-flex justify-center pa-8">
+            <MudProgressCircular Indeterminate="true"
+                                 Color="Color.Primary" />
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(_error))
+    {
+        <MudAlert Severity="Severity.Error">
+            @_error
+        </MudAlert>
+    }
+    else
+    {
+        <MudTable Items="@_customers"
+                  Hover="true"
+                  Striped="true"
+                  Elevation="0">
+
+            <HeaderContent>
+                <MudTh>Mã KH</MudTh>
+                <MudTh>Họ và tên</MudTh>
+                <MudTh>Số điện thoại</MudTh>
+                <MudTh>Email</MudTh>
+                <MudTh>Ngày sinh</MudTh>
+                <MudTh>Trạng thái</MudTh>
+                <MudTh Class="text-center">Thao tác</MudTh>
+            </HeaderContent>
+
+            <RowTemplate>
+                <MudTd DataLabel="Mã KH">
+                    <strong>@context.CustomerCode</strong>
+                </MudTd>
+
+                <MudTd DataLabel="Họ và tên">
+                    @context.FullName
+                </MudTd>
+
+                <MudTd DataLabel="Số điện thoại">
+                    @context.PhoneNumber
+                </MudTd>
+
+                <MudTd DataLabel="Email">
+                    @(string.IsNullOrWhiteSpace(context.Email)
+                        ? "-"
+                        : context.Email)
+                </MudTd>
+
+                <MudTd DataLabel="Ngày sinh">
+                    @(context.DateOfBirth?.ToString("dd/MM/yyyy") ?? "-")
+                </MudTd>
+
+                <MudTd DataLabel="Trạng thái">
+                    @if (context.IsActive)
+                    {
+                        <MudChip T="string"
+                                 Size="Size.Small"
+                                 Color="Color.Success"
+                                 Variant="Variant.Outlined">
+                            Hoạt động
+                        </MudChip>
+                    }
+                    else
+                    {
+                        <MudChip T="string"
+                                 Size="Size.Small"
+                                 Color="Color.Default"
+                                 Variant="Variant.Outlined">
+                            Ngừng hoạt động
+                        </MudChip>
+                    }
+                </MudTd>
+
+                <MudTd DataLabel="Thao tác"
+                       Class="text-center">
+
+                    <MudTooltip Text="Chỉnh sửa">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       OnClick="@(() => EditCustomer(context.Id))" />
+                    </MudTooltip>
+
+                    <MudTooltip Text="Xóa">
+                        <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline"
+                                       Color="Color.Error"
+                                       Size="Size.Small"
+                                       OnClick="@(() => DeleteCustomer(context))" />
+                    </MudTooltip>
+
+                </MudTd>
+            </RowTemplate>
+
+            <NoRecordsContent>
+                <MudText Class="pa-5"
+                         Align="Align.Center"
+                         Color="Color.Secondary">
+                    Không tìm thấy khách hàng.
+                </MudText>
+            </NoRecordsContent>
+
+        </MudTable>
+
+        @if (_totalPages > 1)
         {
-            <MudText>
-                @customer.CustomerCode -
-                @customer.FullName -
-                @customer.PhoneNumber
-            </MudText>
+            <div class="d-flex justify-center mt-5">
+                <MudPagination Count="@_totalPages"
+                               Selected="@_pageNumber"
+                               SelectedChanged="@PageChanged"
+                               Color="Color.Primary" />
+            </div>
         }
+    }
 
-    </MudPaper>
-}
+</MudPaper>
 
 @code {
-    private bool _loading = true;
+    private List<CustomerModel> _customers = [];
 
-    private string? _errorMessage;
+    private string? _search;
+    private string? _error;
 
-    private List<CustomerManagement.Web.Models.Customer.CustomerModel>
-        _customers = [];
+    private bool _loading;
+
+    private int _pageNumber = 1;
+    private const int PageSize = 10;
 
     private int _totalCount;
+    private int _totalPages;
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadCustomers();
+    }
+
+    private async Task LoadCustomers()
+    {
+        _loading = true;
+        _error = null;
+
         try
         {
             var result =
                 await CustomerService.GetCustomersAsync(
-                    pageNumber: 1,
-                    pageSize: 10);
+                    _search,
+                    _pageNumber,
+                    PageSize);
 
             _customers = result.Items;
             _totalCount = result.TotalCount;
+            _totalPages = result.TotalPages;
         }
-        catch (Exception)
+        catch
         {
-            _errorMessage =
-                "Không thể kết nối đến Customer API.";
+            _error =
+                "Không thể tải danh sách khách hàng.";
         }
         finally
         {
             _loading = false;
+        }
+    }
+
+    private async Task HandleSearchKeyDown(
+        KeyboardEventArgs args)
+    {
+        if (args.Key != "Enter")
+            return;
+
+        _pageNumber = 1;
+        await LoadCustomers();
+    }
+
+    private async Task PageChanged(int page)
+    {
+        _pageNumber = page;
+        await LoadCustomers();
+    }
+
+    private void AddCustomer()
+    {
+        Navigation.NavigateTo("/customers/create");
+    }
+
+    private void EditCustomer(int id)
+    {
+        Navigation.NavigateTo($"/customers/edit/{id}");
+    }
+
+    private async Task DeleteCustomer(CustomerModel customer)
+    {
+        var parameters =
+            new DialogParameters<DeleteCustomerDialog>
+            {
+            {
+                x => x.CustomerName,
+                customer.FullName
+            },
+            {
+                x => x.CustomerCode,
+                customer.CustomerCode
+            }
+            };
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true
+        };
+
+        var dialog =
+            await DialogService.ShowAsync<DeleteCustomerDialog>(
+                "Xác nhận xóa",
+                parameters,
+                options);
+
+        var result = await dialog.Result;
+
+        if (result is null ||
+            result.Canceled)
+        {
+            return;
+        }
+
+        try
+        {
+            var success =
+                await CustomerService.DeleteAsync(customer.Id);
+
+            if (!success)
+            {
+                Snackbar.Add(
+                    "Không thể xóa khách hàng.",
+                    Severity.Error);
+
+                return;
+            }
+
+            Snackbar.Add(
+                $"Đã xóa khách hàng {customer.CustomerCode}.",
+                Severity.Success);
+
+            if (_customers.Count == 1 &&
+                _pageNumber > 1)
+            {
+                _pageNumber--;
+            }
+
+            await LoadCustomers();
+        }
+        catch
+        {
+            Snackbar.Add(
+                "Có lỗi xảy ra khi xóa khách hàng.",
+                Severity.Error);
         }
     }
 }

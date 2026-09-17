@@ -1,0 +1,218 @@
+﻿@page "/customers/edit/{Id:int}"
+@attribute [Authorize]
+
+@using CustomerManagement.Web.Models.Customer
+@using CustomerManagement.Web.Services.Interfaces
+
+@inject ICustomerService CustomerService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>Chỉnh sửa khách hàng | CEP</PageTitle>
+
+@if (_loading)
+{
+    <div class="d-flex justify-center pa-8">
+        <MudProgressCircular Indeterminate="true"
+                             Color="Color.Primary" />
+    </div>
+}
+else if (_notFound)
+{
+    <MudAlert Severity="Severity.Warning">
+        Không tìm thấy khách hàng.
+    </MudAlert>
+}
+else
+{
+    <MudText Typo="Typo.h4">
+        Chỉnh sửa khách hàng
+    </MudText>
+
+    <MudText Typo="Typo.body1"
+             Color="Color.Secondary"
+             Class="mb-5">
+        @_customerCode
+    </MudText>
+
+    <MudPaper Elevation="0"
+              Class="pa-6 customer-form">
+
+        <EditForm Model="@_model"
+                  OnValidSubmit="@Save">
+
+            <DataAnnotationsValidator />
+
+            <MudGrid>
+
+                <MudItem xs="12" md="6">
+                    <MudTextField Value="@_customerCode"
+                                  Label="Mã khách hàng"
+                                  Variant="Variant.Outlined"
+                                  Disabled="true" />
+                </MudItem>
+
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="_model.FullName"
+                                  Label="Họ và tên"
+                                  Variant="Variant.Outlined"
+                                  For="@(() => _model.FullName)"
+                                  Required="true" />
+                </MudItem>
+
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="_model.PhoneNumber"
+                                  Label="Số điện thoại"
+                                  Variant="Variant.Outlined"
+                                  For="@(() => _model.PhoneNumber)"
+                                  Required="true" />
+                </MudItem>
+
+                <MudItem xs="12" md="6">
+                    <MudTextField @bind-Value="_model.Email"
+                                  Label="Email"
+                                  Variant="Variant.Outlined"
+                                  For="@(() => _model.Email)" />
+                </MudItem>
+
+                <MudItem xs="12" md="6">
+                    <MudDatePicker @bind-Date="_model.DateOfBirth"
+                                   Label="Ngày sinh"
+                                   Variant="Variant.Outlined"
+                                   DateFormat="dd/MM/yyyy"
+                                   MaxDate="@DateTime.Today" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudSwitch @bind-Value="_model.IsActive"
+                               T="bool"
+                               Color="Color.Primary">
+                        Đang hoạt động
+                    </MudSwitch>
+                </MudItem>
+
+            </MudGrid>
+
+            <MudDivider Class="my-5" />
+
+            <div class="d-flex justify-end gap-3">
+
+                <MudButton Variant="Variant.Outlined"
+                           OnClick="@Cancel"
+                           Disabled="@_saving">
+                    Hủy
+                </MudButton>
+
+                <MudButton ButtonType="ButtonType.Submit"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Save"
+                           Disabled="@_saving">
+                    Lưu thay đổi
+                </MudButton>
+
+            </div>
+
+        </EditForm>
+
+    </MudPaper>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private UpdateCustomerRequest _model = new();
+
+    private string _customerCode = string.Empty;
+
+    private bool _loading = true;
+    private bool _saving;
+    private bool _notFound;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            var customer =
+                await CustomerService.GetByIdAsync(Id);
+
+            if (customer is null)
+            {
+                _notFound = true;
+                return;
+            }
+
+            _customerCode = customer.CustomerCode;
+
+            _model = new UpdateCustomerRequest
+            {
+                FullName = customer.FullName,
+                Email = customer.Email,
+                PhoneNumber = customer.PhoneNumber,
+                DateOfBirth = customer.DateOfBirth,
+                IsActive = customer.IsActive
+            };
+        }
+        catch
+        {
+            _notFound = true;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task Save()
+    {
+        if (_model.DateOfBirth?.Date > DateTime.Today)
+        {
+            Snackbar.Add(
+                "Ngày sinh không được lớn hơn ngày hiện tại.",
+                Severity.Warning);
+
+            return;
+        }
+
+        _saving = true;
+
+        try
+        {
+            var customer =
+                await CustomerService.UpdateAsync(
+                    Id,
+                    _model);
+
+            if (customer is null)
+            {
+                Snackbar.Add(
+                    "Không thể cập nhật khách hàng.",
+                    Severity.Error);
+
+                return;
+            }
+
+            Snackbar.Add(
+                "Cập nhật khách hàng thành công.",
+                Severity.Success);
+
+            Navigation.NavigateTo("/customers");
+        }
+        catch
+        {
+            Snackbar.Add(
+                "Có lỗi xảy ra khi cập nhật.",
+                Severity.Error);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/customers");
+    }
+}

@@ -9,4 +9,12 @@ public interface ICustomerService
         string? search = null,
         int pageNumber = 1,
         int pageSize = 10);
+
+    Task<CustomerModel?> GetByIdAsync(int id);
+
+    Task<CustomerModel?> CreateAsync(CreateCustomerRequest request);
+
+    Task<CustomerModel?> UpdateAsync(int id, UpdateCustomerRequest request);
+
+    Task<bool> DeleteAsync(int id);
 }

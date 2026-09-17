@@ -24,20 +24,70 @@ public class CustomerService : ICustomerService
 
         if (!string.IsNullOrWhiteSpace(search))
         {
-            url += $"&search={Uri.EscapeDataString(search.Trim())}";
+            url +=
+                $"&search={Uri.EscapeDataString(search.Trim())}";
         }
 
         var response =
             await _httpClient.GetFromJsonAsync<
                 ApiResponse<PagedResult<CustomerModel>>>(url);
 
-        if (response is null ||
-            !response.Success ||
-            response.Data is null)
-        {
-            return new PagedResult<CustomerModel>();
-        }
+        return response?.Data ?? new PagedResult<CustomerModel>();
+    }
 
-        return response.Data;
+    public async Task<CustomerModel?> GetByIdAsync(int id)
+    {
+        var response =
+            await _httpClient.GetFromJsonAsync<
+                ApiResponse<CustomerModel>>(
+                    $"api/Customers/{id}");
+
+        return response?.Data;
+    }
+
+    public async Task<CustomerModel?> CreateAsync(
+        CreateCustomerRequest request)
+    {
+        var httpResponse =
+            await _httpClient.PostAsJsonAsync(
+                "api/Customers",
+                request);
+
+        if (!httpResponse.IsSuccessStatusCode)
+            return null;
+
+        var response =
+            await httpResponse.Content
+                .ReadFromJsonAsync<ApiResponse<CustomerModel>>();
+
+        return response?.Data;
+    }
+
+    public async Task<CustomerModel?> UpdateAsync(
+        int id,
+        UpdateCustomerRequest request)
+    {
+        var httpResponse =
+            await _httpClient.PutAsJsonAsync(
+                $"api/Customers/{id}",
+                request);
+
+        if (!httpResponse.IsSuccessStatusCode)
+            return null;
+
+        var response =
+            await httpResponse.Content
+                .ReadFromJsonAsync<ApiResponse<CustomerModel>>();
+
+        return response?.Data;
+    }
+
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var response =
+            await _httpClient.DeleteAsync(
+                $"api/Customers/{id}");
+
+        return response.IsSuccessStatusCode;
     }
 }

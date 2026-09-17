@@ -1,0 +1,160 @@
+﻿@page "/customers/create"
+@attribute [Authorize]
+
+@using CustomerManagement.Web.Models.Customer
+@using CustomerManagement.Web.Services.Interfaces
+
+@inject ICustomerService CustomerService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>Thêm khách hàng | CEP</PageTitle>
+
+<MudText Typo="Typo.h4">
+    Thêm khách hàng
+</MudText>
+
+<MudText Typo="Typo.body1"
+         Color="Color.Secondary"
+         Class="mb-5">
+    Nhập thông tin khách hàng mới
+</MudText>
+
+<MudPaper Elevation="0"
+          Class="pa-6 customer-form">
+
+    <EditForm Model="@_model"
+              OnValidSubmit="@Save">
+
+        <DataAnnotationsValidator />
+
+        <MudGrid>
+
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="_model.FullName"
+                              Label="Họ và tên"
+                              Variant="Variant.Outlined"
+                              For="@(() => _model.FullName)"
+                              Required="true" />
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="_model.PhoneNumber"
+                              Label="Số điện thoại"
+                              Variant="Variant.Outlined"
+                              For="@(() => _model.PhoneNumber)"
+                              Required="true" />
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="_model.Email"
+                              Label="Email"
+                              Variant="Variant.Outlined"
+                              For="@(() => _model.Email)" />
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudDatePicker @bind-Date="_model.DateOfBirth"
+                               Label="Ngày sinh"
+                               Variant="Variant.Outlined"
+                               DateFormat="dd/MM/yyyy"
+                               MaxDate="@DateTime.Today" />
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudSwitch @bind-Value="_model.IsActive"
+                           T="bool"
+                           Color="Color.Primary">
+                    Đang hoạt động
+                </MudSwitch>
+            </MudItem>
+
+        </MudGrid>
+
+        <MudDivider Class="my-5" />
+
+        <div class="d-flex justify-end gap-3">
+
+            <MudButton Variant="Variant.Outlined"
+                       OnClick="@Cancel"
+                       Disabled="@_saving">
+                Hủy
+            </MudButton>
+
+            <MudButton ButtonType="ButtonType.Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Save"
+                       Disabled="@_saving">
+
+                @if (_saving)
+                {
+                    <MudProgressCircular Indeterminate="true"
+                                         Size="Size.Small"
+                                         Class="me-2" />
+                }
+
+                Lưu khách hàng
+            </MudButton>
+
+        </div>
+
+    </EditForm>
+
+</MudPaper>
+
+@code {
+    private readonly CreateCustomerRequest _model = new();
+
+    private bool _saving;
+
+    private async Task Save()
+    {
+        if (_model.DateOfBirth?.Date > DateTime.Today)
+        {
+            Snackbar.Add(
+                "Ngày sinh không được lớn hơn ngày hiện tại.",
+                Severity.Warning);
+
+            return;
+        }
+
+        _saving = true;
+
+        try
+        {
+            var customer =
+                await CustomerService.CreateAsync(_model);
+
+            if (customer is null)
+            {
+                Snackbar.Add(
+                    "Không thể thêm khách hàng.",
+                    Severity.Error);
+
+                return;
+            }
+
+            Snackbar.Add(
+                $"Đã thêm khách hàng {customer.CustomerCode}.",
+                Severity.Success);
+
+            Navigation.NavigateTo("/customers");
+        }
+        catch
+        {
+            Snackbar.Add(
+                "Có lỗi xảy ra khi thêm khách hàng.",
+                Severity.Error);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/customers");
+    }
+}

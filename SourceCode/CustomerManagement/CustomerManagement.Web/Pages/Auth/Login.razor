@@ -4,6 +4,12 @@
 @using CustomerManagement.Web.Models.Auth
 @using CustomerManagement.Web.Services.Interfaces
 
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject IAuthService AuthService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+
 @inject IAuthService AuthService
 @inject NavigationManager Navigation
 
@@ -142,5 +148,16 @@
     private void TogglePassword()
     {
         _showPassword = !_showPassword;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthenticationStateProvider
+            .GetAuthenticationStateAsync();
+
+        if (state.User.Identity?.IsAuthenticated == true)
+        {
+            Navigation.NavigateTo("/");
+        }
     }
 }

@@ -176,3 +176,21 @@ code {
     padding-top: 20px;
     border-top: 1px solid #eef0f3;
 }
+
+.customer-panel {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+}
+
+.customer-search {
+    width: 420px;
+    max-width: 100%;
+}
+
+.customer-form {
+    max-width: 1000px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+}
