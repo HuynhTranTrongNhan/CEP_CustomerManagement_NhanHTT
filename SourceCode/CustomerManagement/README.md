@@ -173,6 +173,53 @@ Before running the project, install:
 - SQL Server Management Studio (optional)
 - Visual Studio 2022+ or another .NET-compatible IDE
 
+## Local Configuration
+
+Sensitive development configuration such as the database connection string and JWT signing key is stored using [.NET User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets) and is not committed to source control.
+
+The repository contains the application configuration structure, while environment-specific secrets must be configured locally before running the API.
+
+### Configure User Secrets
+
+Initialize User Secrets for the API project:
+
+```bash
+dotnet user-secrets init --project CustomerManagement.Api
+```
+
+Configure the SQL Server connection string:
+
+```bash
+dotnet user-secrets set --project CustomerManagement.Api "ConnectionStrings:DefaultConnection" "YOUR_CONNECTION_STRING"
+```
+
+Example using SQL Server Authentication:
+
+```bash
+dotnet user-secrets set --project CustomerManagement.Api "ConnectionStrings:DefaultConnection" "Server=YOUR_SERVER;Database=CustomerManagementDb;User Id=YOUR_USER;Password=YOUR_PASSWORD;TrustServerCertificate=True"
+```
+
+Configure the JWT signing key:
+
+```bash
+dotnet user-secrets set --project CustomerManagement.Api "JwtSettings:SecretKey" "YOUR_SECRET_KEY"
+```
+
+The following JWT settings are non-sensitive and remain in `CustomerManagement.Api/appsettings.json`:
+
+```json
+{
+  "JwtSettings": {
+    "SecretKey": "",
+    "Issuer": "CustomerManagement.Api",
+    "Audience": "CustomerManagement.Web",
+    "ExpirationMinutes": 60
+  }
+}
+```
+
+> Do not commit database passwords or JWT signing keys to source control.
+
 ## Database Configuration
 
 Configure the SQL Server connection string in:
@@ -212,9 +259,7 @@ dotnet restore
 Apply the existing migrations and create/update the database:
 
 ```bash
-dotnet ef database update \
-  --project CustomerManagement.Infrastructure \
-  --startup-project CustomerManagement.Api
+dotnet ef database update --project CustomerManagement.Infrastructure --startup-project CustomerManagement.Api
 ```
 
 The application contains seed data for demonstration purposes.
